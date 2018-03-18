@@ -260,6 +260,7 @@ class OBJECT_OT_mesh_all(bpy.types.Operator):
     bl_label = "Freez / UnFreez Mesh"
     
     def execute(self, context):
+        global mesh
         objects = []
         eligible_objects = []
         objects = bpy.context.scene.objects
@@ -273,12 +274,12 @@ class OBJECT_OT_mesh_all(bpy.types.Operator):
                             eligible_objects.append(obj)
         objcts = eligible_objects
         if mesh == 0:
-            global mesh
+            #global mesh
             mesh = 1
             for obj in objcts:  # deselect all objects
                 obj.hide_select = True
         else:
-            global mesh
+            #global mesh
             mesh = 0
             for obj in objcts:  # deselect all objects
                 obj.hide_select = False
@@ -290,6 +291,7 @@ class OBJECT_OT_curve_all(bpy.types.Operator):
     bl_label = "Freez / UnFreez Curve"
     
     def execute(self, context):
+        global curve
         objects = []
         eligible_objects = []
         objects = bpy.context.scene.objects
@@ -301,12 +303,12 @@ class OBJECT_OT_curve_all(bpy.types.Operator):
                             eligible_objects.append(obj)
         objcts = eligible_objects
         if curve == 0:
-            global curve
+            #global curve
             curve = 1
             for obj in objcts:  # deselect all objects
                 obj.hide_select = True
         else:
-            global curve
+            #global curve
             curve = 0
             for obj in objcts:  # deselect all objects
                 obj.hide_select = False
@@ -318,6 +320,7 @@ class OBJECT_OT_lamp_all(bpy.types.Operator):
     bl_label = "Freez / UnFreez Lamp"
     
     def execute(self, context):
+        global lamp
         objects = []
         eligible_objects = []
         objects = bpy.context.scene.objects
@@ -331,12 +334,12 @@ class OBJECT_OT_lamp_all(bpy.types.Operator):
                             eligible_objects.append(obj)
         objcts = eligible_objects
         if lamp == 0:
-            global lamp
+            #global lamp
             lamp = 1
             for obj in objcts:  # deselect all objects
                 obj.hide_select = True
         else:
-            global curve
+            #global curve
             lamp = 0
             for obj in objcts:  # deselect all objects
                 obj.hide_select = False
@@ -349,6 +352,7 @@ class OBJECT_OT_bone_all(bpy.types.Operator):
     bl_label = "Freez / UnFreez Bone"
     
     def execute(self, context):
+        global bone
         objects = []
         eligible_objects = []
         objects = bpy.context.scene.objects
@@ -360,12 +364,12 @@ class OBJECT_OT_bone_all(bpy.types.Operator):
                             eligible_objects.append(obj)
         objcts = eligible_objects
         if bone == 0:
-            global bone
+            #global bone
             bone = 1
             for obj in objcts:  # deselect all objects
                 obj.hide_select = True
         else:
-            global bone
+            #global bone
             bone = 0
             for obj in objcts:  # deselect all objects
                 obj.hide_select = False
@@ -377,6 +381,7 @@ class OBJECT_OT_camera_all(bpy.types.Operator):
     bl_label = "Freez / UnFreez Camera"
     
     def execute(self, context):
+        global camera
         objects = []
         eligible_objects = []
         objects = bpy.context.scene.objects
@@ -388,12 +393,12 @@ class OBJECT_OT_camera_all(bpy.types.Operator):
                             eligible_objects.append(obj)
         objcts = eligible_objects
         if camera == 0:
-            global camera
+            #global camera
             camera = 1
             for obj in objcts:  # deselect all objects
                 obj.hide_select = True
         else:
-            global camera
+            #global camera
             camera = 0
             for obj in objcts:  # deselect all objects
                 obj.hide_select = False
@@ -405,6 +410,7 @@ class OBJECT_OT_particules_all(bpy.types.Operator):
     bl_label = "Freez / UnFreez Praticles"
     
     def execute(self, context):
+        global particles
         objects = []
         eligible_objects = []
         objects = bpy.context.scene.objects
@@ -416,12 +422,12 @@ class OBJECT_OT_particules_all(bpy.types.Operator):
                             eligible_objects.append(obj)
         objcts = eligible_objects
         if particles == 0:
-            global particles
+            #global particles
             particles = 1
             for obj in objcts:  # deselect all objects
                 obj.hide_select = True
         else:
-            global particles
+            #global particles
             particles = 0
             for obj in objcts:  # deselect all objects
                 obj.hide_select = False
@@ -936,12 +942,13 @@ class Object_Del_history(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
+        global opps1
         if opps1 == 0:
-            global opps1
+            #global opps1
             opps1 = 1
         
         else:
-            global opps1
+            #global opps1
             opps1 = 0
         return {'FINISHED'}
 
@@ -952,11 +959,12 @@ class Object_View_Port(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
+        global opps
         if opps == 0:
-            global opps
+            #global opps
             opps = 1
         
         else:
-            global opps
+            #global opps
             opps = 0
         return {'FINISHED'}
