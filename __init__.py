@@ -18,12 +18,12 @@
 
 
 bl_info = {
-    'name': 'Vismaya Tools-v1.1',
+    'name': 'Vismaya Tools',
     'author': 'Project Vismaya',
-    'version': (0, 1),
+    'version': (1, 1),
     'blender': (2, 56, 2),
     'location': 'View3D > Toolbar',
-    'description': 'Vismaya Tools v1.1',
+    'description': 'Vismaya Tools',
     'category': '3D View'}
 
 import bpy
@@ -106,8 +106,8 @@ class CUSTOM_OT_SelectObjectButton(bpy.types.Operator):
         return {'FINISHED'}
 
 
-# Checks if a specified camera exists
-def checkCamera(c):
+def check_camera(c):
+    """Checks if a specified camera exists."""
     for obj in bpy.context.scene.objects:
         if (obj.type == 'CAMERA'):
             if (obj.name == c):
@@ -115,7 +115,7 @@ def checkCamera(c):
     return False
 
 
-def getCameras():
+def get_cameras():
     out = []
     for obj in bpy.context.scene.objects:
         if (obj.type == 'CAMERA'):
@@ -123,8 +123,8 @@ def getCameras():
     return out
 
 
-# Operator that starts the rendering
 class OBJECT_OT_BatchRenderButton(bpy.types.Operator):
+    """Operator that starts the rendering."""
     bl_idname = "batch_render.render"
     bl_label = "Batch Render"
     
@@ -145,29 +145,29 @@ class OBJECT_OT_BatchRenderButton(bpy.types.Operator):
             rd.resolution_x = it.reso_x
             rd.resolution_y = it.reso_y
             rd.resolution_percentage = it.reso_percentage
-            if (checkCamera(it.camera) == True):
+            if check_camera(it.camera):
                 sce.camera = bpy.data.objects[it.camera]
             else:
                 print(
-                            "I did not find the specified camera for this batch. The camera was " + it.camera + ". Following cameras exist in the scene:")
-                print(getCameras())
+                    "I did not find the specified camera for this batch. The camera was " + it.camera + ". Following cameras exist in the scene:")
+                print(get_cameras())
             
-            if (rd.engine == 'CYCLES'):
+            if rd.engine == 'CYCLES':
                 sce.cycles.samples = it.samples
             
             sce.render.filepath = it.filepath
             sce.render.filepath += ("batch_" + str(batch_count) + "_" + str(it.reso_x) + "x" + str(it.reso_y) + "_")
             
             i = 0
-            while (i < 20):
+            while i < 20:
                 bpy.context.scene.layers[i] = it.layers[i].active
-                if (bpy.context.scene.layers[i] == True):
+                if bpy.context.scene.layers[i]:
                     print("Enabled layer " + str(i + 1))
                 i += 1
             
             print("Rendering frames: " + str(it.start_frame) + " - " + str(it.end_frame))
             print("At resolution " + str(it.reso_x) + "x" + str(it.reso_y) + " (" + str(it.reso_percentage) + "%)")
-            if (rd.engine == 'CYCLES'):
+            if rd.engine == 'CYCLES':
                 print("With " + str(it.samples) + " samples")
             print("using camera " + bpy.context.scene.camera.name)
             print("Saving frames in " + it.filepath)
@@ -175,14 +175,14 @@ class OBJECT_OT_BatchRenderButton(bpy.types.Operator):
             bpy.ops.render.render(animation=True)
         sum = 0
         for it in batcher.frame_ranges:
-            if (it.end_frame >= it.start_frame):
+            if it.end_frame >= it.start_frame:
                 sum += (it.end_frame - it.start_frame)
         print("Rendered " + str(len(batcher.frame_ranges)) + " batches containing " + str(sum) + " frames")
         return {'FINISHED'}
 
 
-# Operator that adds a new frame range to be rendered
 class OBJECT_OT_BatchRenderAddNew(bpy.types.Operator):
+    """Operator that adds a new frame range to be rendered."""
     bl_idname = "batch_render.add_new"
     bl_label = "Add new set"
     
@@ -199,17 +199,17 @@ class OBJECT_OT_BatchRenderAddNew(bpy.types.Operator):
         batcher.frame_ranges[last_item].camera = bpy.context.scene.camera.name
         batcher.frame_ranges[last_item].filepath = bpy.context.scene.render.filepath
         i = 0
-        while (i < 20):
+        while i < 20:
             batcher.frame_ranges[last_item].layers.add()
-            if (bpy.context.scene.layers[i] == True):
+            if bpy.context.scene.layers[i]:
                 batcher.frame_ranges[last_item].layers[i].active = True
             i += 1
         
         return {'FINISHED'}
 
 
-# Removes items that have been marked for deletion
 class OBJECT_OT_BatchRenderRemove(bpy.types.Operator):
+    """Removes items that have been marked for deletion."""
     bl_idname = "batch_render.remove"
     bl_label = "Remove selected sets"
     
@@ -226,7 +226,7 @@ class OBJECT_OT_BatchRenderRemove(bpy.types.Operator):
                     batcher.frame_ranges.remove(count)
                     break
                 count += 1
-                if (count >= (len(batcher.frame_ranges) - 1)):
+                if count >= (len(batcher.frame_ranges) - 1):
                     done = True
         return {'FINISHED'}
 
@@ -268,7 +268,7 @@ class MENU_MT_PresetsSpecials(bpy.types.Menu):
 
 
 ########### Car Rigging ###########
-def Generate(origin):
+def generate(origin):
     print("origin")
     ob = bpy.context.active_object
     ob.show_x_ray = True
@@ -296,205 +296,205 @@ def Generate(origin):
     axis.layers[30] = True
     axis.layers[0] = False
     
-    damperCenter = amt.edit_bones.new("damperCenter")
-    damperCenter.head = ob.data.bones['Body'].head_local
-    damperCenter.tail = (pos3x, pos3y - 1, pos3z)
-    damperCenter.layers[30] = True
-    damperCenter.layers[0] = False
+    damper_center = amt.edit_bones.new("damperCenter")
+    damper_center.head = ob.data.bones['Body'].head_local
+    damper_center.tail = (pos3x, pos3y - 1, pos3z)
+    damper_center.layers[30] = True
+    damper_center.layers[0] = False
     
     body = amt.edit_bones["Body"]
     body.parent = axis
     body.layers[31] = True
     body.layers[0] = False
     
-    FRWheel = amt.edit_bones["FRWheel"]
-    FRWheel.layers[29] = True
-    FRWheel.layers[0] = False
-    FRWheel.parent = damperCenter
+    fr_wheel = amt.edit_bones["FRWheel"]
+    fr_wheel.layers[29] = True
+    fr_wheel.layers[0] = False
+    fr_wheel.parent = damper_center
     
-    FLWheel = amt.edit_bones["FLWheel"]
-    FLWheel.layers[29] = True
-    FLWheel.layers[0] = False
+    fl_wheel = amt.edit_bones["FLWheel"]
+    fl_wheel.layers[29] = True
+    fl_wheel.layers[0] = False
     
-    BRWheel = amt.edit_bones["BRWheel"]
-    BRWheel.layers[29] = True
-    BRWheel.layers[0] = False
-    BRWheel.parent = damperCenter
+    br_wheel = amt.edit_bones["BRWheel"]
+    br_wheel.layers[29] = True
+    br_wheel.layers[0] = False
+    br_wheel.parent = damper_center
     
-    BLWheel = amt.edit_bones["BLWheel"]
-    BLWheel.layers[29] = True
-    BLWheel.layers[0] = False
-    BLWheel.parent = damperCenter
+    bl_wheel = amt.edit_bones["BLWheel"]
+    bl_wheel.layers[29] = True
+    bl_wheel.layers[0] = False
+    bl_wheel.parent = damper_center
     
-    wheelFront = amt.edit_bones.new("wheelFront")
-    wheelFront.head = (posx, posy, posz)
-    wheelFront.tail = (posx, posy - 0.8, posz)
-    wheelFront.parent = damperCenter
-    wheelFront.layers[31] = True
-    wheelFront.layers[0] = False
+    wheel_front = amt.edit_bones.new("wheelFront")
+    wheel_front.head = (posx, posy, posz)
+    wheel_front.tail = (posx, posy - 0.8, posz)
+    wheel_front.parent = damper_center
+    wheel_front.layers[31] = True
+    wheel_front.layers[0] = False
     
-    steeringWheel = amt.edit_bones.new("steeringWheel")
-    steeringWheel.head = (posx, posy - 2, posz)
-    steeringWheel.tail = (posx, posy - 2.5, posz)
+    steering_wheel = amt.edit_bones.new("steeringWheel")
+    steering_wheel.head = (posx, posy - 2, posz)
+    steering_wheel.tail = (posx, posy - 2.5, posz)
     
-    damperFront = amt.edit_bones.new("damperFront")
-    damperFront.head = ob.data.bones['FRWheel'].head_local
-    damperFront.tail = ob.data.bones['FLWheel'].head_local
-    damperFront.layers[30] = True
-    damperFront.layers[0] = False
+    damper_front = amt.edit_bones.new("damperFront")
+    damper_front.head = ob.data.bones['FRWheel'].head_local
+    damper_front.tail = ob.data.bones['FLWheel'].head_local
+    damper_front.layers[30] = True
+    damper_front.layers[0] = False
     
-    damperBack = amt.edit_bones.new("damperBack")
-    damperBack.head = ob.data.bones['BRWheel'].head_local
-    damperBack.tail = ob.data.bones['BLWheel'].head_local
-    damperBack.layers[30] = True
-    damperBack.layers[0] = False
+    damper_back = amt.edit_bones.new("damperBack")
+    damper_back.head = ob.data.bones['BRWheel'].head_local
+    damper_back.tail = ob.data.bones['BLWheel'].head_local
+    damper_back.layers[30] = True
+    damper_back.layers[0] = False
     
     damper = amt.edit_bones.new("damper")
     damper.head = (pos3x, pos3y, pos3z + 2)
     damper.tail = (pos3x, pos3y - 1, pos3z + 2)
-    damper.parent = damperCenter
+    damper.parent = damper_center
     
-    FRSensor = amt.edit_bones.new("FRSensor")
-    FRSensor.head = ob.data.bones['FRWheel'].head_local
-    FRSensor.tail = ob.data.bones['FRWheel'].head_local
-    FRSensor.tail[2] = FRSensor.tail.z + 0.3
-    FRSensor.parent = damperCenter
+    fr_sensor = amt.edit_bones.new("FRSensor")
+    fr_sensor.head = ob.data.bones['FRWheel'].head_local
+    fr_sensor.tail = ob.data.bones['FRWheel'].head_local
+    fr_sensor.tail[2] = fr_sensor.tail.z + 0.3
+    fr_sensor.parent = damper_center
     
-    FLSensor = amt.edit_bones.new("FLSensor")
-    FLSensor.head = ob.data.bones['FLWheel'].head_local
-    FLSensor.tail = ob.data.bones['FLWheel'].head_local
-    FLSensor.tail[2] = FLSensor.tail.z + 0.3
-    FLSensor.parent = damperCenter
+    fl_sensor = amt.edit_bones.new("FLSensor")
+    fl_sensor.head = ob.data.bones['FLWheel'].head_local
+    fl_sensor.tail = ob.data.bones['FLWheel'].head_local
+    fl_sensor.tail[2] = fl_sensor.tail.z + 0.3
+    fl_sensor.parent = damper_center
     
-    BRSensor = amt.edit_bones.new("BRSensor")
-    BRSensor.head = ob.data.bones['BRWheel'].head_local
-    BRSensor.tail = ob.data.bones['BRWheel'].head_local
-    BRSensor.tail[2] = BRSensor.tail.z + 0.3
+    br_sensor = amt.edit_bones.new("BRSensor")
+    br_sensor.head = ob.data.bones['BRWheel'].head_local
+    br_sensor.tail = ob.data.bones['BRWheel'].head_local
+    br_sensor.tail[2] = br_sensor.tail.z + 0.3
     
-    BLSensor = amt.edit_bones.new("BLSensor")
-    BLSensor.head = ob.data.bones['BLWheel'].head_local
-    BLSensor.tail = ob.data.bones['BLWheel'].head_local
-    BLSensor.tail[2] = BLSensor.tail.z + 0.3
-    BLSensor.parent = damperCenter
+    bl_sensor = amt.edit_bones.new("BLSensor")
+    bl_sensor.head = ob.data.bones['BLWheel'].head_local
+    bl_sensor.tail = ob.data.bones['BLWheel'].head_local
+    bl_sensor.tail[2] = bl_sensor.tail.z + 0.3
+    bl_sensor.parent = damper_center
     
-    WheelRot = amt.edit_bones.new("WheelRot")
-    WheelRot.head = ob.data.bones['FLWheel'].head_local
-    WheelRot.tail = ob.data.bones['FLWheel'].head_local
-    WheelRot.tail[1] = FLSensor.tail.y + 0.3
-    WheelRot.parent = damperCenter
+    wheel_rot = amt.edit_bones.new("WheelRot")
+    wheel_rot.head = ob.data.bones['FLWheel'].head_local
+    wheel_rot.tail = ob.data.bones['FLWheel'].head_local
+    wheel_rot.tail[1] = fl_sensor.tail.y + 0.3
+    wheel_rot.parent = damper_center
     
-    FLWheel.parent = WheelRot
+    fl_wheel.parent = wheel_rot
     
     #####################################Pose Constraints#################################
     bpy.ops.object.mode_set(mode='POSE')
     
     # Locked Track constraint wheelFront -> steeringWheel
-    wheelFront = ob.pose.bones['wheelFront']
-    cns1 = wheelFront.constraints.new('LOCKED_TRACK')
+    wheel_front = ob.pose.bones['wheelFront']
+    cns1 = wheel_front.constraints.new('LOCKED_TRACK')
     cns1.target = ob
     cns1.subtarget = 'steeringWheel'
     
     # Copy Location constraint FLWheel -> FLSensor
-    FLWheel = ob.pose.bones['FLWheel']
-    cns3b = FLWheel.constraints.new('COPY_LOCATION')
+    fl_wheel = ob.pose.bones['FLWheel']
+    cns3b = fl_wheel.constraints.new('COPY_LOCATION')
     cns3b.target = ob
     cns3b.subtarget = 'FLSensor'
     cns3b.use_x = False
     cns3b.use_y = False
     # Damped Track constraint FLWheel -> damperFront
-    cns3 = FLWheel.constraints.new('DAMPED_TRACK')
+    cns3 = fl_wheel.constraints.new('DAMPED_TRACK')
     cns3.track_axis = "TRACK_X"
     cns3.target = ob
     cns3.subtarget = 'damperFront'
     # Copy Location constraint FLWheel -> damperFront
-    cns3b = FLWheel.constraints.new('COPY_LOCATION')
+    cns3b = fl_wheel.constraints.new('COPY_LOCATION')
     cns3b.target = ob
     cns3b.subtarget = 'damperFront'
     cns3b.head_tail = 1
     cns3b.use_y = False
     cns3b.use_z = False
     # Copy Rotation constraint FLWheel -> wheelFront
-    cns2 = FLWheel.constraints.new('COPY_ROTATION')
+    cns2 = fl_wheel.constraints.new('COPY_ROTATION')
     cns2.target = ob
     cns2.subtarget = 'wheelFront'
     cns2.use_x = False
     cns2.use_y = False
     
     # Copy Location constraint FRWheel -> FRSensor
-    FRWheel = ob.pose.bones['FRWheel']
-    cns3b = FRWheel.constraints.new('COPY_LOCATION')
+    fr_wheel = ob.pose.bones['FRWheel']
+    cns3b = fr_wheel.constraints.new('COPY_LOCATION')
     cns3b.target = ob
     cns3b.subtarget = 'FRSensor'
     cns3b.use_x = False
     cns3b.use_y = False
     # Damped Track constraint FRWheel -> damperFront
-    cns3 = FRWheel.constraints.new('DAMPED_TRACK')
+    cns3 = fr_wheel.constraints.new('DAMPED_TRACK')
     cns3.track_axis = "TRACK_NEGATIVE_X"
     cns3.target = ob
     cns3.subtarget = 'damperFront'
     cns3.head_tail = 1
     # Copy Rotation constraint FRWheel -> wheelFront
-    cns3a = FRWheel.constraints.new('COPY_ROTATION')
+    cns3a = fr_wheel.constraints.new('COPY_ROTATION')
     cns3a.target = ob
     cns3a.subtarget = 'wheelFront'
     cns3a.use_x = False
     cns3a.use_y = False
     # Copy Rotation constraint RRWheel -> BLWHeel
-    cns3c = FRWheel.constraints.new('COPY_ROTATION')
+    cns3c = fr_wheel.constraints.new('COPY_ROTATION')
     cns3c.target = ob
     cns3c.subtarget = 'FLWheel'
     cns3c.use_y = False
     cns3c.use_z = False
     
     # Copy Location constraint BRWheel -> BRSensor
-    BRWheel = ob.pose.bones['BRWheel']
-    cns3b = BRWheel.constraints.new('COPY_LOCATION')
+    br_wheel = ob.pose.bones['BRWheel']
+    cns3b = br_wheel.constraints.new('COPY_LOCATION')
     cns3b.target = ob
     cns3b.subtarget = 'BRSensor'
     cns3b.use_x = False
     cns3b.use_y = False
     # Damped Track constraint BRWheel -> damperBack
-    cns3 = BRWheel.constraints.new('DAMPED_TRACK')
+    cns3 = br_wheel.constraints.new('DAMPED_TRACK')
     cns3.track_axis = "TRACK_NEGATIVE_X"
     cns3.head_tail = 1
     cns3.target = ob
     cns3.subtarget = 'damperBack'
     # Copy Rotation constraint BRWheel -> BLWHeel
-    cns3c = BRWheel.constraints.new('COPY_ROTATION')
+    cns3c = br_wheel.constraints.new('COPY_ROTATION')
     cns3c.target = ob
     cns3c.subtarget = 'FLWheel'
     cns3c.use_y = False
     cns3c.use_z = False
     
     # Copy Location constraint BLWheel -> BLSensor
-    BLWheel = ob.pose.bones['BLWheel']
-    cns3b = BLWheel.constraints.new('COPY_LOCATION')
+    bl_wheel = ob.pose.bones['BLWheel']
+    cns3b = bl_wheel.constraints.new('COPY_LOCATION')
     cns3b.target = ob
     cns3b.subtarget = 'BLSensor'
     cns3b.use_x = False
     cns3b.use_y = False
     # Damped Track constraint BLWheel -> damperBack
-    cns3 = BLWheel.constraints.new('DAMPED_TRACK')
+    cns3 = bl_wheel.constraints.new('DAMPED_TRACK')
     cns3.track_axis = "TRACK_X"
     cns3.target = ob
     cns3.subtarget = 'damperBack'
     # Copy Location constraint BLWheel -> damperBack
-    cns3b = BLWheel.constraints.new('COPY_LOCATION')
+    cns3b = bl_wheel.constraints.new('COPY_LOCATION')
     cns3b.target = ob
     cns3b.subtarget = 'damperBack'
     cns3b.head_tail = 1
     cns3b.use_y = False
     cns3b.use_z = False
     # Copy Rotation constraint BLWheel -> BLWHeel
-    cns3c = BLWheel.constraints.new('COPY_ROTATION')
+    cns3c = bl_wheel.constraints.new('COPY_ROTATION')
     cns3c.target = ob
     cns3c.subtarget = 'FLWheel'
     cns3c.use_y = False
     cns3c.use_z = False
     
     # Transformation constraint Body -> damper
-    damperCenter = ob.pose.bones['Body']
-    cns4 = damperCenter.constraints.new('TRANSFORM')
+    damper_center = ob.pose.bones['Body']
+    cns4 = damper_center.constraints.new('TRANSFORM')
     cns4.target = ob
     cns4.subtarget = 'damper'
     cns4.from_min_x = -0.3
@@ -511,8 +511,8 @@ def Generate(origin):
     cns4.owner_space = 'LOCAL'
     cns4.target_space = 'LOCAL'
     # Transformation constraint Body -> damper
-    damperCenter = ob.pose.bones['Body']
-    cns4 = damperCenter.constraints.new('TRANSFORM')
+    damper_center = ob.pose.bones['Body']
+    cns4 = damper_center.constraints.new('TRANSFORM')
     cns4.target = ob
     cns4.subtarget = 'damper'
     cns4.from_min_z = -0.1
@@ -546,49 +546,49 @@ def Generate(origin):
     cns7.influence = 0.5
     
     # Copy Location constraint damperBack -> BRWheel
-    damperBack = ob.pose.bones['damperBack']
-    cns8 = damperBack.constraints.new('COPY_LOCATION')
+    damper_back = ob.pose.bones['damperBack']
+    cns8 = damper_back.constraints.new('COPY_LOCATION')
     cns8.target = ob
     cns8.subtarget = 'BRWheel'
     # Tract To constraint damperBack -> BLWheel
-    cns9 = damperBack.constraints.new('TRACK_TO')
+    cns9 = damper_back.constraints.new('TRACK_TO')
     cns9.target = ob
     cns9.subtarget = 'BLWheel'
     
     # Copy Location constraint damperFront -> FRWheel
-    damperFront = ob.pose.bones['damperFront']
-    cns10 = damperFront.constraints.new('COPY_LOCATION')
+    damper_front = ob.pose.bones['damperFront']
+    cns10 = damper_front.constraints.new('COPY_LOCATION')
     cns10.target = ob
     cns10.subtarget = 'FRWheel'
     # Tract To constraint damperFront -> FLWheel
-    cns11 = damperFront.constraints.new('TRACK_TO')
+    cns11 = damper_front.constraints.new('TRACK_TO')
     cns11.target = ob
     cns11.subtarget = 'FLWheel'
     
     # Copy Location constraint FLSensor -> 
-    FLSensor = ob.pose.bones['FLSensor']
-    FLSensor.lock_location = (True, False, True)
-    cns = FLSensor.constraints.new('SHRINKWRAP')
+    fl_sensor = ob.pose.bones['FLSensor']
+    fl_sensor.lock_location = (True, False, True)
+    cns = fl_sensor.constraints.new('SHRINKWRAP')
     # Copy Location constraint FRSensor -> 
-    FRSensor = ob.pose.bones['FRSensor']
-    FRSensor.lock_location = (True, False, True)
-    cns = FRSensor.constraints.new('SHRINKWRAP')
+    fr_sensor = ob.pose.bones['FRSensor']
+    fr_sensor.lock_location = (True, False, True)
+    cns = fr_sensor.constraints.new('SHRINKWRAP')
     # Copy Location constraint BLSensor -> 
-    BLSensor = ob.pose.bones['BLSensor']
-    BLSensor.lock_location = (True, False, True)
-    cns = BLSensor.constraints.new('SHRINKWRAP')
+    bl_sensor = ob.pose.bones['BLSensor']
+    bl_sensor.lock_location = (True, False, True)
+    cns = bl_sensor.constraints.new('SHRINKWRAP')
     # Copy Location constraint BRSensor -> 
-    BRSensor = ob.pose.bones['BRSensor']
-    BRSensor.lock_location = (True, False, True)
-    cns = BRSensor.constraints.new('SHRINKWRAP')
+    br_sensor = ob.pose.bones['BRSensor']
+    br_sensor.lock_location = (True, False, True)
+    cns = br_sensor.constraints.new('SHRINKWRAP')
     
     # Copy Location constraint WheelRot -> FLSensor
-    WheelRot = ob.pose.bones['WheelRot']
-    WheelRot.rotation_mode = "XYZ"
-    WheelRot.lock_location = (True, True, True)
-    WheelRot.lock_rotation = (False, True, True)
+    wheel_rot = ob.pose.bones['WheelRot']
+    wheel_rot.rotation_mode = "XYZ"
+    wheel_rot.lock_location = (True, True, True)
+    wheel_rot.lock_rotation = (False, True, True)
     
-    cns = WheelRot.constraints.new('COPY_LOCATION')
+    cns = wheel_rot.constraints.new('COPY_LOCATION')
     cns.target = ob
     cns.subtarget = 'FLSensor'
     cns.use_x = False
@@ -604,7 +604,7 @@ def Generate(origin):
     empty.show_x_ray = True
     empty.empty_draw_type = "ARROWS"
     
-    FLWheel.rotation_mode = "XYZ"
+    fl_wheel.rotation_mode = "XYZ"
     
     fcurve = ob.pose.bones["FLWheel"].driver_add('rotation_euler', 0)
     drv = fcurve.driver
@@ -645,29 +645,29 @@ def CreateCarMetaRig(origin):  # create Car meta rig
     scn.objects.link(rig)
     scn.objects.active = rig
     scn.update()
-
+    
     # create meta rig bones
     bpy.ops.object.mode_set(mode='EDIT')
     body = amt.edit_bones.new('Body')
     body.head = (0, 0, 0)
     body.tail = (0, 0, 0.8)
     
-    FRW = amt.edit_bones.new('FLWheel')
-    FRW.head = (0.9, -2, 0)
-    FRW.tail = (0.9, -2.5, 0)
+    frw = amt.edit_bones.new('FLWheel')
+    frw.head = (0.9, -2, 0)
+    frw.tail = (0.9, -2.5, 0)
     
-    FLW = amt.edit_bones.new('FRWheel')
-    FLW.head = (-0.9, -2, 0)
-    FLW.tail = (-0.9, -2.5, 0)
+    flw = amt.edit_bones.new('FRWheel')
+    flw.head = (-0.9, -2, 0)
+    flw.tail = (-0.9, -2.5, 0)
     
-    BRW = amt.edit_bones.new('BLWheel')
-    BRW.head = (0.9, 2, 0)
-    BRW.tail = (0.9, 1.5, 0)
+    brw = amt.edit_bones.new('BLWheel')
+    brw.head = (0.9, 2, 0)
+    brw.tail = (0.9, 1.5, 0)
     
-    BLW = amt.edit_bones.new('BRWheel')
-    BLW.head = (-0.9, 2, 0)
-    BLW.tail = (-0.9, 1.5, 0)
-
+    blw = amt.edit_bones.new('BRWheel')
+    blw.head = (-0.9, 2, 0)
+    blw.tail = (-0.9, 1.5, 0)
+    
     # swith to object mode
     bpy.ops.object.mode_set(mode='OBJECT')
 
@@ -773,7 +773,8 @@ def drag(self, context):
     if bpy.context.selected_objects:
         for act in acciones(bpy.context.selected_objects):
             offset(act, wm.drag)
-    if wm.drag: wm.drag = 0
+    if wm.drag:
+        wm.drag = 0
     refresco()
 
 
@@ -827,93 +828,93 @@ class RunAction(bpy.types.Operator):
         # Save old data
         # ----------------------
         scene = context.scene
-        selectObject = context.active_object
+        select_object = context.active_object
         camera = bpy.data.objects[bpy.context.scene.camera.name]
-        savedCursor = bpy.context.scene.cursor_location.copy()  # cursor position
-        savedFrame = scene.frame_current
-        if (scene.use_cursor == False):
+        saved_cursor = bpy.context.scene.cursor_location.copy()  # cursor position
+        saved_frame = scene.frame_current
+        if not scene.use_cursor:
             bpy.ops.view3d.snap_cursor_to_selected()
-
+        
         # -------------------------
         # Create empty and parent
         # -------------------------
         bpy.ops.object.empty_add(type='PLAIN_AXES')
-        myEmpty = bpy.data.objects[bpy.context.active_object.name]
+        my_empty = bpy.data.objects[bpy.context.active_object.name]
         
-        myEmpty.location = selectObject.location
-        savedState = myEmpty.matrix_world
-        myEmpty.parent = selectObject
-        myEmpty.name = 'MCH_Rotation_target'
-        myEmpty.matrix_world = savedState
+        my_empty.location = select_object.location
+        saved_state = my_empty.matrix_world
+        my_empty.parent = select_object
+        my_empty.name = 'MCH_Rotation_target'
+        my_empty.matrix_world = saved_state
         
         # -------------------------
         # Parent camera to empty
         # -------------------------
-        savedState = camera.matrix_world
-        camera.parent = myEmpty
-        camera.matrix_world = savedState
-
+        saved_state = camera.matrix_world
+        camera.parent = my_empty
+        camera.matrix_world = saved_state
+        
         # -------------------------
         # Now add revolutions
         # (make empty active object)
         # -------------------------
         bpy.ops.object.select_all(False)
-        myEmpty.select = True
-        bpy.context.scene.objects.active = myEmpty
+        my_empty.select = True
+        bpy.context.scene.objects.active = my_empty
         # save current configuration
-        savedInterpolation = context.user_preferences.edit.keyframe_new_interpolation_type
+        saved_interpolation = context.user_preferences.edit.keyframe_new_interpolation_type
         # change interpolation mode
         context.user_preferences.edit.keyframe_new_interpolation_type = 'LINEAR'
         # create first frame
-        myEmpty.rotation_euler = (0, 0, 0)
-        myEmpty.empty_draw_size = 0.1
+        my_empty.rotation_euler = (0, 0, 0)
+        my_empty.empty_draw_size = 0.1
         bpy.context.scene.frame_set(scene.frame_start)
-        myEmpty.keyframe_insert(data_path='rotation_euler', frame=(scene.frame_start))
+        my_empty.keyframe_insert(data_path='rotation_euler', frame=(scene.frame_start))
         # Dolly zoom
-        if (scene.dolly_zoom != "0"):
+        if scene.dolly_zoom != "0":
             bpy.data.cameras[camera.name].lens = scene.camera_from_lens
             bpy.data.cameras[camera.name].keyframe_insert('lens', frame=(scene.frame_start))
         
         # Calculate rotation XYZ
-        if (scene.inverse_x):
-            iX = -1
+        if scene.inverse_x:
+            i_x = -1
         else:
-            iX = 1
+            i_x = 1
         
         if (scene.inverse_y):
-            iY = -1
+            i_y = -1
         else:
-            iY = 1
+            i_y = 1
         
-        if (scene.inverse_z):
-            iZ = -1
+        if scene.inverse_z:
+            i_z = -1
         else:
-            iZ = 1
+            i_z = 1
         
-        xRot = (math.pi * 2) * scene.camera_revol_x * iX
-        yRot = (math.pi * 2) * scene.camera_revol_y * iY
-        zRot = (math.pi * 2) * scene.camera_revol_z * iZ
+        x_rot = (math.pi * 2) * scene.camera_revol_x * i_x
+        y_rot = (math.pi * 2) * scene.camera_revol_y * i_y
+        z_rot = (math.pi * 2) * scene.camera_revol_z * i_z
         
         # create middle frame
-        if (scene.back_forw == True):
-            myEmpty.rotation_euler = (xRot, yRot, zRot)
-            myEmpty.keyframe_insert(data_path='rotation_euler', frame=((scene.frame_end - scene.frame_start) / 2))
+        if scene.back_forw:
+            my_empty.rotation_euler = (x_rot, y_rot, z_rot)
+            my_empty.keyframe_insert(data_path='rotation_euler', frame=((scene.frame_end - scene.frame_start) / 2))
             # reverse
-            xRot = xRot * -1
-            yRot = yRot * -1
-            zRot = 0
+            x_rot = x_rot * -1
+            y_rot = y_rot * -1
+            z_rot = 0
         
         # Dolly zoom
-        if (scene.dolly_zoom == "2"):
+        if scene.dolly_zoom == "2":
             bpy.data.cameras[camera.name].lens = scene.camera_to_lens
             bpy.data.cameras[camera.name].keyframe_insert('lens', frame=((scene.frame_end - scene.frame_start) / 2))
         
         # create last frame
-        myEmpty.rotation_euler = (xRot, yRot, zRot)
-        myEmpty.keyframe_insert(data_path='rotation_euler', frame=(scene.frame_end))
+        my_empty.rotation_euler = (x_rot, y_rot, z_rot)
+        my_empty.keyframe_insert(data_path='rotation_euler', frame=(scene.frame_end))
         # Dolly zoom
-        if (scene.dolly_zoom != "0"):
-            if (scene.dolly_zoom == "1"):
+        if scene.dolly_zoom != "0":
+            if scene.dolly_zoom == "1":
                 bpy.data.cameras[camera.name].lens = scene.camera_to_lens  # final
             else:
                 bpy.data.cameras[camera.name].lens = scene.camera_from_lens  # back to init
@@ -921,24 +922,24 @@ class RunAction(bpy.types.Operator):
             bpy.data.cameras[camera.name].keyframe_insert('lens', frame=scene.frame_end)
         
         # Track constraint
-        if (scene.track == True):
+        if scene.track:
             bpy.context.scene.objects.active = camera
             bpy.ops.object.constraint_add(type='TRACK_TO')
             bpy.context.object.constraints[-1].track_axis = 'TRACK_NEGATIVE_Z'
             bpy.context.object.constraints[-1].up_axis = 'UP_Y'
-            bpy.context.object.constraints[-1].target = bpy.data.objects[myEmpty.name]
+            bpy.context.object.constraints[-1].target = bpy.data.objects[my_empty.name]
         
         # back previous configuration
-        context.user_preferences.edit.keyframe_new_interpolation_type = savedInterpolation
-        bpy.context.scene.cursor_location = savedCursor
-
+        context.user_preferences.edit.keyframe_new_interpolation_type = saved_interpolation
+        bpy.context.scene.cursor_location = saved_cursor
+        
         # -------------------------
         # Back to old selection
         # -------------------------
         bpy.ops.object.select_all(False)
-        selectObject.select = True
-        bpy.context.scene.objects.active = selectObject
-        bpy.context.scene.frame_set(savedFrame)
+        select_object.select = True
+        bpy.context.scene.objects.active = select_object
+        bpy.context.scene.frame_set(saved_frame)
         
         return {'FINISHED'}
 
@@ -1680,7 +1681,7 @@ class GenerateRig(bpy.types.Operator):
     bl_options = {'UNDO'}
     
     def execute(self, context):
-        Generate((0, 0, 0))
+        generate((0, 0, 0))
         return {"FINISHED"}
 
 
@@ -1801,4 +1802,3 @@ def unregister():
 
 if __name__ == "__main__":
     register()
-
