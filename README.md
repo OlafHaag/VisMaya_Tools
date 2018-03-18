@@ -1,5 +1,5 @@
 # VisMaya Tools
-Python Addon for Blender. Provides a tab in the toolbar with operations usually found in Autodesk's Maya.
+Python Addon for Blender. Provides a tab in the view3d toolbar with operations named how they're usually found in Autodesk's Maya. This may be useful for users that migrate from Maya to Blender.
 
 For its history and more information, see this forum thread:
 https://blenderartists.org/forum/showthread.php?321282-Update-For-Maya-to-Blender-Migrators-Vismaya-Tools-Ver-1-1-Released
