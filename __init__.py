@@ -23,7 +23,8 @@ bl_info = {
     'version': (1, 1),
     'blender': (2, 56, 2),
     'location': 'View3D > Toolbar',
-    'description': 'Vismaya Tools',
+    'description': 'Toolbar interface for operations with terminologies usually used in Autodesk\'s Maya which may be useful for users migrating from Maya to Blender.',
+    'tracker_url': 'https://github.com/OlafHaag/VisMaya_Tools/issues/new',
     'category': '3D View'}
 
 import bpy
